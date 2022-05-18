@@ -19,12 +19,35 @@ async function run() {
         await client.connect();
         const todoCollection = client.db('todo').collection('courses');
 
-        app.get('/course', async (req, res) => {
+        app.get('/todo', async (req, res) => {
             const query = {}
             const cursor = todoCollection.find(query);
             const courses = await cursor.toArray();
             res.send(courses)
         });
+
+        // single details
+        app.get('/course/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const course = await todoCollection.findOne(query);
+            res.send(course);
+        })
+
+        app.post('/todo', async (req, res) => {
+            const newTodo = req.body;
+            const result = await todoCollection.insertOne(newTodo);
+            res.send(result);
+        })
+
+        // delete inventory
+        app.delete('/todo/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const result = await todoCollection.deleteOne(query);
+            res.send(result)
+        })
+
     }
     finally {
 
